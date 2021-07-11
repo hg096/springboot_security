@@ -19,7 +19,7 @@ import com.cos.securityex01.config.auth.PrincipalDetails;
 import com.cos.securityex01.model.User;
 import com.cos.securityex01.repository.UserRepository;
 
-@Controller
+@Controller // view를 리턴
 public class IndexController {
 
 	@Autowired
@@ -29,8 +29,10 @@ public class IndexController {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@GetMapping({ "", "/" })
-	public @ResponseBody String index() {
-		return "인덱스 페이지입니다.";
+	public String index() {
+		// 머스테치 기본 폴더 src/main/resources/ 
+		// 뷰 리졸버 설정: templates(prefix), .mustache(suffix) 생략가능!!(기본값)
+		return "index";
 	}
 
 	@GetMapping("/user")
@@ -52,13 +54,14 @@ public class IndexController {
 	}
 	
 	//@PostAuthorize("hasRole('ROLE_MANAGER')")
-	//@PreAuthorize("hasRole('ROLE_MANAGER')")
+	//@PreAuthorize("hasRole('ROLE_MANAGER')"or"hasRole('ROLE_ADMIN')") //메서드 실행직전에 실행 2개이상 걸때
 	@Secured("ROLE_MANAGER")
 	@GetMapping("/manager")
 	public @ResponseBody String manager() {
 		return "매니저 페이지입니다.";
 	}
 
+	// 스프링 시큐리티 해당주소를 낚아챔 >> SecurityConfig 파일생성후 작동안함
 	@GetMapping("/login")
 	public String login() {
 		return "login";
@@ -69,14 +72,16 @@ public class IndexController {
 		return "join";
 	}
 
-	@PostMapping("/joinProc")
+	@PostMapping("/joinProc") // insert는 POST
 	public String joinProc(User user) {
 		System.out.println("회원가입 진행 : " + user);
+		// 패스워드 암호화
 		String rawPassword = user.getPassword();
 		String encPassword = bCryptPasswordEncoder.encode(rawPassword);
 		user.setPassword(encPassword);
+		
 		user.setRole("ROLE_USER");
-		userRepository.save(user);
-		return "redirect:/";
+		userRepository.save(user); // 이것만으로 회원가입 잘됨 하지만 패스워드가 암호화가 안되어있어서 시큐리티로 로그인 불가
+		return "redirect:/login";
 	}
 }

@@ -14,10 +14,10 @@ spring:
     username: cos
     password: cos1234
     
-  mvc:
-    view:
-      prefix: /templates/
-      suffix: .mustache
+#  mvc:
+#    view:
+#      prefix: /templates/
+#      suffix: .mustache   #안넣어도 무방 pom.xml에 머스테치 넣어서 기본값으로 들어감
 
   jpa:
     hibernate:
